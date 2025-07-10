@@ -11,26 +11,23 @@ program main
   integer,parameter :: n(2) = [200, 200]
 
   ! local variables
-  integer :: i, j, k
-  real(8) :: png
-  character(len=8) :: ctmp(9)
+  integer :: i, j, k, ipng
+  character(len=8) :: ctmp(8)
   real(8),allocatable :: chi(:,:) !< 特性関数
   real(8),allocatable :: lsf(:,:) !< レベルセット関数
   
   ! svg を png に変換
-  call system(trim("magick " // trim(fn_svg) // " test.png"))
+  call system(trim("magick -density 600 " // trim(fn_svg) // " -resize 200x200 tmp.png"))
 
   ! png を txt に変換
-  call system("magick test.png -type Grayscale tmp1.txt")
-
+  call system("magick tmp.png -type Grayscale tmp1.txt")
+  
   ! txt を整形
-  call system("awk -f fix_gray.awk tmp1.txt > tmp2.txt")
-  call system('sed s/","/" "/g tmp2.txt > tmp3.txt') ! カンマを削除
-  call system('sed s/"("/"( "/g tmp3.txt > tmp4.txt') ! 始カッコの直後にスペースを挿入
-  call system('sed s/")"/" )"/g tmp4.txt > tmp5.txt') ! 終カッコの直前にスペースを挿入
+  call system('sed s/"("/"( "/g tmp1.txt > tmp2.txt') ! 始カッコの直後にスペースを挿入
+  call system('sed s/")"/" )"/g tmp2.txt > tmp3.txt') ! 終カッコの直前にスペースを挿入
 
   ! find indcolour
-  open(1,file="tmp5.txt")
+  open(1,file="tmp3.txt")
   read(1,*) !空読み
   
   ! load the characteristic function
@@ -38,8 +35,8 @@ program main
   chi(:,:)=0
   do j=1,n(2)
      do i=1,n(1)
-        read(1,*) (ctmp(k),k=1,8), png
-        chi(i,n(2)-j+1)=(100.d0-png)/100.d0
+        read(1,*) (ctmp(k),k=1,3), ipng
+        chi(i,n(2)-j+1)=(65535.d0-ipng)/65535.d0
      end do
   end do
   close(1)
@@ -49,8 +46,8 @@ program main
   do j=1,n(2)
      do i=1,n(1)
         write(1,*) i,j,chi(i,j)
-        if(chi(i,j)>0)then
-           write(2,*) (i-100)/100.d0, (j-100)/100.d0
+        if(chi(i,j)>0.99)then
+           write(2,*) 2.d0*(i-1.5d0)/dble(n(1)-2)-1.d0, 2.d0*(j-1.5d0)/dble(n(2)-2)-1.d0
         end if
      end do
      write(1,*) 
@@ -77,8 +74,8 @@ program main
 
   call lsf2elm(n(1)-2,n(2)-2,[-1.d0,-1.d0],[1.d0,1.d0],1,trim("phi.txt"),trim("mesh.txt"),trim("mesh_gp.txt"))
   
-  ! ! 中間ファイルを削除
+  ! 中間ファイルを削除
   call system("rm -f *tmp*")
-  call system("rm -f lsf.txt orig.gp *mod a.out")
+  call system("rm -f orig.gp *mod a.out")
 
 end program main

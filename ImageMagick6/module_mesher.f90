@@ -380,7 +380,7 @@ contains
       do iy=0,ysize
          do ix=0,xsize
             read(10,*) tmp,tmp,lsfunc(ix,iy)
-            if(abs(lsfunc(ix,iy)).le.5.d-3) lsfunc(ix,iy)=sign(1.d0,lsfunc(ix,iy))*5.d-3
+!!$            if(abs(lsfunc(ix,iy)).le.5.d-3) lsfunc(ix,iy)=sign(1.d0,lsfunc(ix,iy))*5.d-3
          end do
       end do
       close(10)
@@ -429,9 +429,9 @@ contains
 
                if (((f1>=0.d0).and.(f2<0.d0)).or.((f1<0.d0).and.(f2>=0.d0))) then ! 辺の両端の符号が違ったら
                   ww=abs(lsftmp(i)/(lsftmp(i)-lsftmp(j))) ! 節点iからの距離 lsftmp(i):x=(lsftmp(i)-lsftmp(j)):1
-                  if( dabs( lsftmp(i) )<eps1 ) ww=0.0d0 !必要か？
-                  if( ww>0.95d0 ) ww=0.95d0
-                  if( ww<0.05d0 ) ww=0.05d0
+!!$                  if( dabs( lsftmp(i) )<eps1 ) ww=0.0d0 !必要か？
+!!$                  if( ww>0.95d0 ) ww=0.95d0
+!!$                  if( ww<0.05d0 ) ww=0.05d0
                   ! 節点座標計算
                   if( i==0 ) au=au+ww
                   if( i==1 ) av=av+ww

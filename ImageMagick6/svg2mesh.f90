@@ -12,7 +12,7 @@ program main
 
   ! local variables
   integer :: i, j, k, ipng
-  character(len=8) :: ctmp(9)
+  character(len=8) :: ctmp(3)
   real(8),allocatable :: chi(:,:) !< 特性関数
   real(8),allocatable :: lsf(:,:) !< レベルセット関数
   
@@ -23,12 +23,10 @@ program main
   call system("convert tmp.png -type Grayscale tmp1.txt")
 
   ! txt を整形
-  call system('sed s/","/" "/g tmp1.txt > tmp2.txt') ! カンマを削除
-  call system('sed s/"("/"( "/g tmp2.txt > tmp3.txt') ! 始カッコの直後にスペースを挿入
-  call system('sed s/")"/" )"/g tmp3.txt > tmp4.txt') ! 終カッコの直前にスペースを挿入
+  call system('sed s/"("/"( "/g tmp1.txt > tmp2.txt') ! 始カッコの直後にスペースを挿入
 
   ! find indcolour
-  open(1,file="tmp4.txt")
+  open(1,file="tmp2.txt")
   read(1,*) !空読み
   
   ! load the characteristic function
@@ -36,7 +34,7 @@ program main
   chi(:,:)=0
   do j=1,n(2)
      do i=1,n(1)
-        read(1,*) (ctmp(k),k=1,9), ipng
+        read(1,*) (ctmp(k),k=1,3), ipng
         chi(i,n(2)-j+1)=(255.d0-ipng)/255.d0
      end do
   end do
@@ -47,8 +45,8 @@ program main
   do j=1,n(2)
      do i=1,n(1)
         write(1,*) i,j,chi(i,j)
-        if(chi(i,j)>0)then
-           write(2,*) (i-100)/100.d0, (j-100)/100.d0
+        if(chi(i,j)>0.99)then
+           write(2,*) 2.d0*(i-1.5d0)/dble(n(1)-2)-1.d0, 2.d0*(j-1.5d0)/dble(n(2)-2)-1.d0
         end if
      end do
      write(1,*) 
@@ -75,8 +73,8 @@ program main
 
   call lsf2elm(n(1)-2,n(2)-2,[-1.d0,-1.d0],[1.d0,1.d0],1,trim("phi.txt"),trim("mesh.txt"),trim("mesh_gp.txt"))
   
-  ! ! 中間ファイルを削除
+  ! 中間ファイルを削除
   call system("rm -f *tmp*")
-  call system("rm -f lsf.txt orig.gp *mod a.out")
+  call system("rm -f orig.gp *mod a.out")
 
 end program main
