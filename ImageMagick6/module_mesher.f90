@@ -380,7 +380,7 @@ contains
       do iy=0,ysize
          do ix=0,xsize
             read(10,*) tmp,tmp,lsfunc(ix,iy)
-!!$            if(abs(lsfunc(ix,iy)).le.5.d-3) lsfunc(ix,iy)=sign(1.d0,lsfunc(ix,iy))*5.d-3
+            if(abs(lsfunc(ix,iy)).le.eps1) lsfunc(ix,iy)=sign(1.d0,lsfunc(ix,iy))*eps1
          end do
       end do
       close(10)
